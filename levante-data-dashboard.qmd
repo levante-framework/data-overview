@@ -1,0 +1,105 @@
+---
+title: "LEVANTE data overview"
+format: dashboard
+theme: cosmo
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+
+.font <- "Source Sans Pro"
+theme_set(theme_bw(base_size = 14, base_family = .font))
+theme_update(panel.grid = element_blank(),
+             strip.background = element_blank(),
+             legend.key = element_blank(),
+             panel.border = element_blank(),
+             axis.line = element_line(),
+             strip.text = element_text(face = "bold"))
+
+pal <- list(primary = "#f7ca69", secondary = "#69F7CA", tertiary = "#CA69F7",
+            light = "#9c9c9c")
+```
+
+```{r}
+#| label: load-data
+
+participants_co <- read_rds("data/participants.rds") |> mutate(country = "Colombia")
+trials_co <- read_rds("data/trials_coded.rds")
+
+participants_fake <- tibble(country = "Fakelandia", user_id = as.character(1:1000))
+
+participants <- bind_rows(participants_co, participants_fake) |>
+  mutate(country = country |> fct_infreq() |> fct_rev())
+trials <- trials_co
+```
+
+```{r}
+#| label: all-values
+
+display_vals <- list(
+  n_countries = participants |> distinct(country) |> nrow(),
+  n_children = participants |> distinct(user_id) |> nrow(),
+  n_runs  = trials |> distinct(user_id, run_id) |> nrow()
+)
+```
+
+## Row {height="25%"}
+
+```{r}
+#| content: valuebox
+#| title: "Countries"
+
+list(
+  icon = "globe",
+  color = pal$secondary,
+  value = display_vals$n_countries
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "Children"
+
+list(
+  icon = "person-arms-up",
+  color = pal$primary,
+  value = display_vals$n_children
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "Assessments"
+
+list(
+  icon = "clipboard-data",
+  color = pal$tertiary,
+  value = display_vals$n_runs
+)
+```
+
+## Row {height="75%"}
+
+### Column {width="50%"}
+
+```{r}
+#| title: "Country counts"
+
+ggplot(participants, aes(y = country)) +
+  geom_bar(fill = pal$primary) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(x = "Number of participants", y = "Country")
+```
+
+### Column {width="50%"}
+
+```{r}
+#| title: "Age counts"
+
+ggplot(participants, aes(x = age)) +
+  geom_histogram(binwidth = 1, fill = pal$primary) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(x = "Age (years)", y = "Number of participants")
+```
