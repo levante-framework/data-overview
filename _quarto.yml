@@ -1,5 +1,4 @@
 project:
   title: "levante-data-dashboard"
-
-
-
+  preview:
+    port: 4200

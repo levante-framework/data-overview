@@ -25,23 +25,20 @@ pal <- list(primary = "#f7ca69", secondary = "#69F7CA", tertiary = "#CA69F7",
 ```{r}
 #| label: load-data
 
-participants_co <- read_rds("data/participants.rds") |> mutate(country = "Colombia")
-trials_co <- read_rds("data/trials_coded.rds")
-
-participants_fake <- tibble(country = "Fakelandia", user_id = as.character(1:1000))
-
-participants <- bind_rows(participants_co, participants_fake) |>
-  mutate(country = country |> fct_infreq() |> fct_rev())
-trials <- trials_co
+runs_combined <- redivis::user("mikabr")$
+  project("combined_summary")$
+  table("runs_combined_output")$
+  to_tibble()
 ```
 
 ```{r}
 #| label: all-values
 
 display_vals <- list(
-  n_countries = participants |> distinct(country) |> nrow(),
-  n_children = participants |> distinct(user_id) |> nrow(),
-  n_runs  = trials |> distinct(user_id, run_id) |> nrow()
+  n_sites = runs_combined |> distinct(site) |> nrow(),
+  n_tasks = runs_combined |> distinct(task_id) |> nrow(),
+  n_users = runs_combined |> distinct(user_id) |> nrow(),
+  n_runs = runs_combined |> distinct(user_id, run_id) |> nrow()
 )
 ```
 
@@ -49,23 +46,23 @@ display_vals <- list(
 
 ```{r}
 #| content: valuebox
-#| title: "Countries"
+#| title: "Sites"
 
 list(
   icon = "globe",
   color = pal$secondary,
-  value = display_vals$n_countries
+  value = display_vals$n_sites
 )
 ```
 
 ```{r}
 #| content: valuebox
-#| title: "Children"
+#| title: "Participants"
 
 list(
   icon = "person-arms-up",
   color = pal$primary,
-  value = display_vals$n_children
+  value = display_vals$n_users
 )
 ```
 
@@ -84,22 +81,62 @@ list(
 
 ### Column {width="50%"}
 
-```{r}
-#| title: "Country counts"
+### Row {.tabset}
 
-ggplot(participants, aes(y = country)) +
+```{r}
+#| title: "Participants by site"
+
+ggplot(runs_combined |> distinct(site, user_id), aes(y = site)) +
   geom_bar(fill = pal$primary) +
   scale_x_continuous(expand = c(0, 0)) +
-  labs(x = "Number of participants", y = "Country")
+  labs(x = "Number of participants", y = "")
+```
+
+```{r}
+#| title: "Assessments by site"
+
+ggplot(runs_combined |> distinct(site, run_id), aes(y = site)) +
+  geom_bar(fill = pal$tertiary) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(x = "Number of assessments", y = "")
+```
+
+```{r}
+#| title: "Ages by site"
+
+ggplot(runs_combined, aes(x = age, fill = site)) +
+  geom_histogram(binwidth = 1) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(x = "Age (years)", y = "Number of assessments")
 ```
 
 ### Column {width="50%"}
 
-```{r}
-#| title: "Age counts"
+### Row {.tabset}
 
-ggplot(participants, aes(x = age)) +
-  geom_histogram(binwidth = 1, fill = pal$primary) +
+```{r}
+#| title: "Participants by task"
+
+ggplot(runs_combined |> distinct(task_id, user_id), aes(y = task_id)) +
+  geom_bar(fill = pal$primary) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(x = "Number of participants", y = "")
+```
+
+```{r}
+#| title: "Assessments by task"
+
+ggplot(runs_combined |> distinct(task_id, run_id), aes(y = task_id)) +
+  geom_bar(fill = pal$tertiary) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(x = "Number of assessments", y = "")
+```
+
+```{r}
+#| title: "Ages by task"
+
+ggplot(runs_combined, aes(x = age, fill = task_id)) +
+  geom_histogram(binwidth = 1) +
   scale_y_continuous(expand = c(0, 0)) +
-  labs(x = "Age (years)", y = "Number of participants")
+  labs(x = "Age (years)", y = "Number of assessments")
 ```
