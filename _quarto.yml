@@ -2,3 +2,7 @@ project:
   title: "levante-data-dashboard"
   preview:
     port: 4200
+
+format:
+  html:
+    theme: [cosmo, theme.scss]
