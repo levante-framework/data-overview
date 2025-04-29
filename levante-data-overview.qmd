@@ -26,20 +26,24 @@ pal <- list(primary = "#f7ca69", secondary = "#69F7CA", tertiary = "#CA69F7",
 ```{r}
 #| label: load-data
 
-runs_combined <- redivis::user("mikabr")$
-  project("combined_summary")$
-  table("runs_combined_output")$
+runs_processed <- redivis::user("mikabr")$
+  project("pilot_summary")$
+  table("runs_processed")$
   to_tibble()
+
+runs <- runs_processed |>
+  mutate(site = dataset |> str_remove("_pilot") |> fct_infreq(),
+         task_id = task_id |> fct_infreq())
 ```
 
 ```{r}
 #| label: all-values
 
 display_vals <- list(
-  n_sites = runs_combined |> distinct(site) |> nrow(),
-  n_tasks = runs_combined |> distinct(task_id) |> nrow(),
-  n_users = runs_combined |> distinct(user_id) |> nrow(),
-  n_runs = runs_combined |> distinct(user_id, run_id) |> nrow()
+  n_sites = runs |> distinct(site) |> nrow(),
+  n_tasks = runs |> distinct(task_id) |> nrow(),
+  n_users = runs |> distinct(user_id) |> nrow(),
+  n_runs = runs |> distinct(user_id, run_id) |> nrow()
 )
 ```
 
@@ -87,7 +91,7 @@ list(
 ```{r}
 #| title: "Participants by site"
 
-ggplot(runs_combined |> distinct(site, user_id), aes(y = site)) +
+ggplot(runs |> distinct(site, user_id), aes(y = site)) +
   geom_bar(fill = pal$primary) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Number of participants", y = "")
@@ -96,7 +100,7 @@ ggplot(runs_combined |> distinct(site, user_id), aes(y = site)) +
 ```{r}
 #| title: "Assessments by site"
 
-ggplot(runs_combined |> distinct(site, run_id), aes(y = site)) +
+ggplot(runs |> distinct(site, run_id), aes(y = site)) +
   geom_bar(fill = pal$tertiary) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Number of assessments", y = "")
@@ -105,7 +109,7 @@ ggplot(runs_combined |> distinct(site, run_id), aes(y = site)) +
 ```{r}
 #| title: "Ages by site"
 
-ggplot(runs_combined, aes(x = age, fill = site)) +
+ggplot(runs, aes(x = age, fill = site)) +
   geom_histogram(binwidth = 1) +
   scale_y_continuous(expand = c(0, 0)) +
   labs(x = "Age (years)", y = "Number of assessments")
@@ -118,7 +122,7 @@ ggplot(runs_combined, aes(x = age, fill = site)) +
 ```{r}
 #| title: "Participants by task"
 
-ggplot(runs_combined |> distinct(task_id, user_id), aes(y = task_id)) +
+ggplot(runs |> distinct(task_id, user_id), aes(y = task_id)) +
   geom_bar(fill = pal$primary) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Number of participants", y = "")
@@ -127,7 +131,7 @@ ggplot(runs_combined |> distinct(task_id, user_id), aes(y = task_id)) +
 ```{r}
 #| title: "Assessments by task"
 
-ggplot(runs_combined |> distinct(task_id, run_id), aes(y = task_id)) +
+ggplot(runs |> distinct(task_id, run_id), aes(y = task_id)) +
   geom_bar(fill = pal$tertiary) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Number of assessments", y = "")
@@ -136,7 +140,7 @@ ggplot(runs_combined |> distinct(task_id, run_id), aes(y = task_id)) +
 ```{r}
 #| title: "Ages by task"
 
-ggplot(runs_combined, aes(x = age, fill = task_id)) +
+ggplot(runs, aes(x = age, fill = task_id)) +
   geom_histogram(binwidth = 1) +
   scale_y_continuous(expand = c(0, 0)) +
   labs(x = "Age (years)", y = "Number of assessments")
