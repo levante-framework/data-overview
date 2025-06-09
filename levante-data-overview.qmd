@@ -9,6 +9,7 @@ preview:
 #| label: setup
 
 library(tidyverse)
+library(redivis)
 
 .font <- "Whitney"
 theme_set(theme_bw(base_size = 14, base_family = .font))
@@ -26,8 +27,8 @@ pal <- list(primary = "#f7ca69", secondary = "#69F7CA", tertiary = "#CA69F7",
 ```{r}
 #| label: load-data
 
-runs_processed <- redivis::user("mikabr")$
-  project("pilot_summary")$
+runs_processed <- redivis$user("mikabr")$
+  workflow("pilot_summary")$
   table("runs_processed")$
   to_tibble()
 
