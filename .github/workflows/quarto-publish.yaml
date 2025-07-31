@@ -32,6 +32,9 @@ jobs:
         with:
           cache-version: 1
 
+      - name: Update source data
+        run: Rscript update.R
+
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
