@@ -3,7 +3,7 @@ library(redivis)
 library(stringr)
 
 # get reference to summary workflow
-wf <- redivis$user("mikabr")$workflow("pilot_summary")
+wf <- redivis$user("mikabr")$workflow("levante_data_overview:gy1z")
 
 # given Datasource, update it to version "current"
 update_dataset <- \(ds) {
