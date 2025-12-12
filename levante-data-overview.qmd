@@ -28,7 +28,7 @@ pal <- list(primary = "#f7ca69", secondary = "#69F7CA", tertiary = "#CA69F7",
 #| label: load-data
 
 runs_processed <- redivis$user("mikabr")$
-  workflow("pilot_summary")$
+  workflow("levante_data_overview:gy1z")$
   table("runs_processed")$
   to_tibble()
 
